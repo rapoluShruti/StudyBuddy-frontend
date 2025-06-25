@@ -242,70 +242,147 @@ const checkAndHandleLimit = () => {
   }
   return false;
 };
+  // const handleSubmit = async (e) => {
+  //   if (e) e.preventDefault();
+
+  //   if (checkAndHandleLimit()) {
+  //     return;
+  //   }
+
+  //   // Require login for all users except logged-in ones
+  //   if (!user || user.isAnonymous) {
+  //     setShowLoginModal(true);
+  //     setError("Please log in to use StudyBuddy.");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+  //   setError("");
+  //   setNotes("");
+  //   setVideos([]);
+  //   setSearchedTopic(topic);
+  //   setShowPopup(false);
+  //   setShowExplanationModal(false);
+
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_BASE_URL}/api/study`,
+  //       commonFetchOptions("POST", { topic, type: selectedType })
+  //     );
+
+  //     if (user && !user.isPremium) {
+  //       const userToUpdate = {
+  //         ...user,
+  //         dailyRequestsCount: (user.dailyRequestsCount || 0) + 1,
+  //       };
+  //       updateUsageAndUser(userToUpdate);
+  //     }
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       if (errorData.code === "LIMIT_EXCEEDED") {
+  //         setError(errorData.error);
+  //         setShowDummyPaymentModal(true);
+  //         return;
+  //       }
+  //       throw new Error(errorData.error || `Status: ${response.status}`);
+  //     }
+
+  //     const data = await response.json();
+  //     if (data.notes) setNotes(data.notes);
+  //     if (data.videos) setVideos(data.videos);
+
+  //     localStorage.setItem(
+  //       "lastStudyOutput",
+  //       JSON.stringify({
+  //         notes: data.notes || "",
+  //         videos: data.videos || [],
+  //         searchedTopic: topic,
+  //       })
+  //     );
+  //   } catch (err) {
+  //     setError(`Failed to fetch: ${err.message}`);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault();
+  if (e) e.preventDefault();
 
-    if (checkAndHandleLimit()) {
-      return;
+  if (checkAndHandleLimit()) {
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+  setNotes("");
+  setVideos([]);
+  setSearchedTopic(topic);
+  setShowPopup(false);
+  setShowExplanationModal(false);
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/study`,
+      commonFetchOptions("POST", { topic, type: selectedType })
+    );
+
+    // For logged-in users (not premium)
+    if (user && !user.isPremium) {
+      const userToUpdate = {
+        ...user,
+        dailyRequestsCount: (user.dailyRequestsCount || 0) + 1,
+      };
+      updateUsageAndUser(userToUpdate);
     }
 
-    // Require login for all users except logged-in ones
-    if (!user || user.isAnonymous) {
-      setShowLoginModal(true);
-      setError("Please log in to use StudyBuddy.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    setNotes("");
-    setVideos([]);
-    setSearchedTopic(topic);
-    setShowPopup(false);
-    setShowExplanationModal(false);
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/study`,
-        commonFetchOptions("POST", { topic, type: selectedType })
-      );
-
-      if (user && !user.isPremium) {
-        const userToUpdate = {
-          ...user,
-          dailyRequestsCount: (user.dailyRequestsCount || 0) + 1,
-        };
-        updateUsageAndUser(userToUpdate);
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.code === "LIMIT_EXCEEDED") {
-          setError(errorData.error);
-          setShowDummyPaymentModal(true);
-          return;
-        }
-        throw new Error(errorData.error || `Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      if (data.notes) setNotes(data.notes);
-      if (data.videos) setVideos(data.videos);
-
+    // For anonymous (not logged in) users
+    if (!user) {
+      setUserRequestsCount((prev) => prev + 1);
       localStorage.setItem(
-        "lastStudyOutput",
+        "anonymousUserId",
+        "anonymous"
+      );
+      localStorage.setItem(
+        `anonUser_anonymous`,
         JSON.stringify({
-          notes: data.notes || "",
-          videos: data.videos || [],
-          searchedTopic: topic,
+          _id: "anonymous",
+          isAnonymous: true,
+          isPremium: false,
+          dailyRequestsCount: userRequestsCount + 1,
+          lastRequestDate: new Date().toISOString(),
         })
       );
-    } catch (err) {
-      setError(`Failed to fetch: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
-  };
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      if (errorData.code === "LIMIT_EXCEEDED") {
+        setError(errorData.error);
+        setShowDummyPaymentModal(true);
+        return;
+      }
+      throw new Error(errorData.error || `Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.notes) setNotes(data.notes);
+    if (data.videos) setVideos(data.videos);
+
+    localStorage.setItem(
+      "lastStudyOutput",
+      JSON.stringify({
+        notes: data.notes || "",
+        videos: data.videos || [],
+        searchedTopic: topic,
+      })
+    );
+  } catch (err) {
+    setError(`Failed to fetch: ${err.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAskBuddy = async () => {
     if (!selectedText) return;
