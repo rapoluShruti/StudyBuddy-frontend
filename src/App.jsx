@@ -40,8 +40,7 @@ import NewPlan from "./pages/NewPlan";
 import GoPro from "./pages/GoPro";
 import Navbar from "./components/Navbar";
 import Layout from "./components/Layout";
-
-import StudyBuddy from "./components/Studybuddy";
+import StudyBuddy from "./components/StuBuddy";
 
 export default function App() {
   return (

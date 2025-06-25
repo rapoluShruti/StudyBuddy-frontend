@@ -5,7 +5,7 @@ import Hero from "./Hero";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
 
-import StudyBuddy from "../components/Studybuddy";
+import StudyBuddy from "../components/StuBuddy";
 
 const Home = () => {
   return (
