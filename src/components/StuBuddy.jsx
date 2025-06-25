@@ -192,32 +192,56 @@ const StudyBuddy = () => {
   };
 
   // Centralized function to check limits and show modal
-  const checkAndHandleLimit = () => {
-    if (user && user.isPremium) {
-      return false;
-    }
-    if (!user && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
-      setShowLoginModal(true);
-      setError("You've used your free search. Please log in to continue!");
-      return true;
-    }
-    if (user && user.isAnonymous && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
-      setShowLoginModal(true);
-      setError(
-        "You've used your free anonymous search. Please log in to continue!"
-      );
-      return true;
-    }
-    if (user && !user.isPremium && userRequestsCount >= LOGGED_IN_FREE_LIMIT) {
-      setShowDummyPaymentModal(true);
-      setError(
-        `You've used your ${LOGGED_IN_FREE_LIMIT} free requests for today. Please upgrade to continue!`
-      );
-      return true;
-    }
+  // const checkAndHandleLimit = () => {
+  //   if (user && user.isPremium) {
+  //     return false;
+  //   }
+  //   if (!user && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
+  //     setShowLoginModal(true);
+  //     setError("You've used your free search. Please log in to continue!");
+  //     return true;
+  //   }
+  //   if (user && user.isAnonymous && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
+  //     setShowLoginModal(true);
+  //     setError(
+  //       "You've used your free anonymous search. Please log in to continue!"
+  //     );
+  //     return true;
+  //   }
+  //   if (user && !user.isPremium && userRequestsCount >= LOGGED_IN_FREE_LIMIT) {
+  //     setShowDummyPaymentModal(true);
+  //     setError(
+  //       `You've used your ${LOGGED_IN_FREE_LIMIT} free requests for today. Please upgrade to continue!`
+  //     );
+  //     return true;
+  //   }
+  //   return false;
+  // };
+const checkAndHandleLimit = () => {
+  // Premium users have no limit
+  if (user && user.isPremium) {
     return false;
-  };
-
+  }
+  // Anonymous (not logged in) user: allow 1 free request
+  if (!user && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
+    setShowLoginModal(true);
+    setError("You've used your free search. Please log in to continue!");
+    return true;
+  }
+  // Anonymous user object (from localStorage): allow 1 free request
+  if (user && user.isAnonymous && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
+    setShowLoginModal(true);
+    setError("You've used your free anonymous search. Please log in to continue!");
+    return true;
+  }
+  // Logged in, not premium: allow 2 free requests
+  if (user && !user.isPremium && !user.isAnonymous && userRequestsCount >= LOGGED_IN_FREE_LIMIT) {
+    setShowDummyPaymentModal(true);
+    setError(`You've used your ${LOGGED_IN_FREE_LIMIT} free requests for today. Please upgrade to continue!`);
+    return true;
+  }
+  return false;
+};
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
 
