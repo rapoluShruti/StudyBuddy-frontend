@@ -82,51 +82,7 @@ const StudyBuddy = () => {
       }
       setUser(parsedUser);
       setUserRequestsCount(parsedUser.dailyRequestsCount || 0);
-    } 
-    // else {
-      // If no logged-in user, try to load anonymous user
-      // const anonymousUserId = localStorage.getItem("anonymousUserId");
-      // if (anonymousUserId) {
-      //   const storedAnonymousData = localStorage.getItem(
-      //     `anonUser_${anonymousUserId}`
-      //   );
-      //   if (storedAnonymousData) {
-      //     const parsedAnonymousData = JSON.parse(storedAnonymousData);
-      //     const lastAnonymousRequestDate = new Date(
-      //       parsedAnonymousData.lastRequestDate
-      //     );
-      //     const today = new Date();
-
-      //     if (
-      //       lastAnonymousRequestDate.toDateString() !== today.toDateString()
-      //     ) {
-      //       parsedAnonymousData.dailyRequestsCount = 0;
-      //       parsedAnonymousData.lastRequestDate = today.toISOString();
-      //       localStorage.setItem(
-      //         `anonUser_${anonymousUserId}`,
-      //         JSON.stringify(parsedAnonymousData)
-      //       );
-      //     }
-      //     setUser({
-      //       _id: anonymousUserId,
-      //       isAnonymous: true,
-      //       isPremium: false,
-      //       dailyRequestsCount: parsedAnonymousData.dailyRequestsCount || 0,
-      //       lastRequestDate: parsedAnonymousData.lastRequestDate,
-      //     });
-        //   setUserRequestsCount(parsedAnonymousData.dailyRequestsCount || 0);
-        // } else {
-        //   setUser({
-        //     _id: anonymousUserId,
-        //     isAnonymous: true,
-        //     isPremium: false,
-        //     dailyRequestsCount: 0,
-        //     lastRequestDate: new Date().toISOString(),
-        //   });
-        //   setUserRequestsCount(0);
-        // }
-      // } 
-            else {
+    }else {
         setUser(null);
         setUserRequestsCount(0);
       }
