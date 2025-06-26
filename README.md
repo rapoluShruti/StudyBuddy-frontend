@@ -35,21 +35,7 @@
 
 ---
 
-## 🪄 Architecture Overview
 
-```mermaid
-flowchart TD
-    subgraph Client
-        A[React • Vite] --> B[Query Service]
-    end
-    subgraph API
-        B --> C[Express Router]
-        C -->|/api/ask| D[AI Controller]
-        C -->|/api/resources| E[Resource Controller]
-    end
-    D -->|Gemini 2.0 Flash| F((Gemini))
-    E -->|YouTube Data API| G((YouTube))
-    C --> H[(MongoDB)]
 ```
 
 ---
@@ -129,7 +115,7 @@ Distributed under the **MIT** License. See `LICENSE` for details.
 
 ## 🙋‍♂️ Author
 
-**Your Name** – [@yourLinkedIn](https://www.linkedin.com/in/shruti-rapolu/) 
+**Your Name** – [@LinkedIn](https://www.linkedin.com/in/shruti-rapolu/) 
 
 ---
 
