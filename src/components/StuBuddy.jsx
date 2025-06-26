@@ -487,8 +487,7 @@ const StudyBuddy = () => {
               Login Required
             </h2>
             <p className="text-sky-600">
-              You've used your free submission! Please login with your real
-              account to continue learning.
+              You've used your free submission! Please login with to continue learning.
             </p>
           </div>
           <div className="space-y-4">
@@ -811,6 +810,7 @@ const StudyBuddy = () => {
     </span>
   </div>
 )}
+            </div>
           
         {/* Floating Header */}
         <div className="text-center mb-12">
