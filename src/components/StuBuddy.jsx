@@ -502,7 +502,7 @@ const checkAndHandleLimit = () => {
     setSelectedText("");
     window.getSelection().removeAllRanges();
   }
-};ś
+};
 
   const mockLogout = () => {
     localStorage.removeItem("user");
