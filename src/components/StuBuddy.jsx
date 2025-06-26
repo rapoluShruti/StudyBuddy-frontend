@@ -82,7 +82,8 @@ const StudyBuddy = () => {
       }
       setUser(parsedUser);
       setUserRequestsCount(parsedUser.dailyRequestsCount || 0);
-    } else {
+    } 
+    // else {
       // If no logged-in user, try to load anonymous user
       // const anonymousUserId = localStorage.getItem("anonymousUserId");
       // if (anonymousUserId) {
@@ -124,7 +125,8 @@ const StudyBuddy = () => {
         //   });
         //   setUserRequestsCount(0);
         // }
-      } else {
+      // } 
+            else {
         setUser(null);
         setUserRequestsCount(0);
       }
