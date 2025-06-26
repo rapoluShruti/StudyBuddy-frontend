@@ -84,46 +84,46 @@ const StudyBuddy = () => {
       setUserRequestsCount(parsedUser.dailyRequestsCount || 0);
     } else {
       // If no logged-in user, try to load anonymous user
-      const anonymousUserId = localStorage.getItem("anonymousUserId");
-      if (anonymousUserId) {
-        const storedAnonymousData = localStorage.getItem(
-          `anonUser_${anonymousUserId}`
-        );
-        if (storedAnonymousData) {
-          const parsedAnonymousData = JSON.parse(storedAnonymousData);
-          const lastAnonymousRequestDate = new Date(
-            parsedAnonymousData.lastRequestDate
-          );
-          const today = new Date();
+      // const anonymousUserId = localStorage.getItem("anonymousUserId");
+      // if (anonymousUserId) {
+      //   const storedAnonymousData = localStorage.getItem(
+      //     `anonUser_${anonymousUserId}`
+      //   );
+      //   if (storedAnonymousData) {
+      //     const parsedAnonymousData = JSON.parse(storedAnonymousData);
+      //     const lastAnonymousRequestDate = new Date(
+      //       parsedAnonymousData.lastRequestDate
+      //     );
+      //     const today = new Date();
 
-          if (
-            lastAnonymousRequestDate.toDateString() !== today.toDateString()
-          ) {
-            parsedAnonymousData.dailyRequestsCount = 0;
-            parsedAnonymousData.lastRequestDate = today.toISOString();
-            localStorage.setItem(
-              `anonUser_${anonymousUserId}`,
-              JSON.stringify(parsedAnonymousData)
-            );
-          }
-          setUser({
-            _id: anonymousUserId,
-            isAnonymous: true,
-            isPremium: false,
-            dailyRequestsCount: parsedAnonymousData.dailyRequestsCount || 0,
-            lastRequestDate: parsedAnonymousData.lastRequestDate,
-          });
-          setUserRequestsCount(parsedAnonymousData.dailyRequestsCount || 0);
-        } else {
-          setUser({
-            _id: anonymousUserId,
-            isAnonymous: true,
-            isPremium: false,
-            dailyRequestsCount: 0,
-            lastRequestDate: new Date().toISOString(),
-          });
-          setUserRequestsCount(0);
-        }
+      //     if (
+      //       lastAnonymousRequestDate.toDateString() !== today.toDateString()
+      //     ) {
+      //       parsedAnonymousData.dailyRequestsCount = 0;
+      //       parsedAnonymousData.lastRequestDate = today.toISOString();
+      //       localStorage.setItem(
+      //         `anonUser_${anonymousUserId}`,
+      //         JSON.stringify(parsedAnonymousData)
+      //       );
+      //     }
+      //     setUser({
+      //       _id: anonymousUserId,
+      //       isAnonymous: true,
+      //       isPremium: false,
+      //       dailyRequestsCount: parsedAnonymousData.dailyRequestsCount || 0,
+      //       lastRequestDate: parsedAnonymousData.lastRequestDate,
+      //     });
+        //   setUserRequestsCount(parsedAnonymousData.dailyRequestsCount || 0);
+        // } else {
+        //   setUser({
+        //     _id: anonymousUserId,
+        //     isAnonymous: true,
+        //     isPremium: false,
+        //     dailyRequestsCount: 0,
+        //     lastRequestDate: new Date().toISOString(),
+        //   });
+        //   setUserRequestsCount(0);
+        // }
       } else {
         setUser(null);
         setUserRequestsCount(0);
@@ -217,27 +217,24 @@ const StudyBuddy = () => {
   //   }
   //   return false;
   // };
-const checkAndHandleLimit = () => {
+//check
+  const checkAndHandleLimit = () => {
+  // Require login for all users
+  if (!user) {
+    setShowLoginModal(true);
+    setError("Please log in to continue!");
+    return true;
+  }
   // Premium users have no limit
-  if (user && user.isPremium) {
+  if (user.isPremium) {
     return false;
   }
-  // Anonymous (not logged in) user: allow 1 free request
-  if (!user && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
-    setShowLoginModal(true);
-    setError("You've used your free search. Please log in to continue!");
-    return true;
-  }
-  // Anonymous user object (from localStorage): allow 1 free request
-  if (user && user.isAnonymous && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
-    setShowLoginModal(true);
-    setError("You've used your free anonymous search. Please log in to continue!");
-    return true;
-  }
-  // Logged in, not premium: allow 2 free requests
-  if (user && !user.isPremium && !user.isAnonymous && userRequestsCount >= LOGGED_IN_FREE_LIMIT) {
+  // Free user daily limit
+  if (userRequestsCount >= LOGGED_IN_FREE_LIMIT) {
     setShowDummyPaymentModal(true);
-    setError(`You've used your ${LOGGED_IN_FREE_LIMIT} free requests for today. Please upgrade to continue!`);
+    setError(
+      `You've used your ${LOGGED_IN_FREE_LIMIT} free requests for today. Please upgrade to continue!`
+    );
     return true;
   }
   return false;
@@ -506,7 +503,7 @@ const checkAndHandleLimit = () => {
 
   const mockLogout = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("anonymousUserId");
+    
     localStorage.removeItem("lastStudyOutput");
     setNotes("");
     setVideos([]);
@@ -823,59 +820,40 @@ const checkAndHandleLimit = () => {
         <div className="flex justify-between items-center mb-8">
           <div></div>
           <div className="flex items-center space-x-4">
-            {user ? (
-              <div className="flex items-center space-x-3 bg-white/60 backdrop-blur-sm rounded-xl px-4 py-2 border border-sky-200">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold">
-                    {user.username
-                      ? user.username[0]
-                      : user.isAnonymous
-                      ? "A"
-                      : "?"}
-                  </span>
-                </div>
-                <span className="text-sky-700 font-medium">
-                  {user.isAnonymous
-                    ? "Anonymous User"
-                    : `Welcome, ${user.username}!`}
-                </span>
-                {user.isPremium ? (
-                  <span className="text-purple-600 font-bold text-sm">
-                    PREMIUM ✨
-                  </span>
-                ) : (
-                  <span className="text-amber-600 text-sm">
-                    {userRequestsCount} / {effectiveDailyLimit} requests used
-                  </span>
-                )}
-                <button
-                  onClick={mockLogout}
-                  className="text-sky-600 hover:text-sky-800 font-medium text-sm transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-xl px-4 py-2 border border-sky-200">
-                <span className="text-sky-600 text-sm">
-                  {userRequestsCount >= ANONYMOUS_FREE_LIMIT
-                    ? "Free trial used"
-                    : `${
-                        ANONYMOUS_FREE_LIMIT - userRequestsCount
-                      } free search remaining`}
-                </span>
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    userRequestsCount >= ANONYMOUS_FREE_LIMIT
-                      ? "bg-red-400"
-                      : "bg-emerald-400"
-                  }`}
-                ></div>
-              </div>
-            )}
-          </div>
-        </div>
-
+           {user ? (
+  <div className="flex items-center space-x-3 bg-white/60 backdrop-blur-sm rounded-xl px-4 py-2 border border-sky-200">
+    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
+      <span className="text-white font-bold">
+        {user.username ? user.username[0] : "?"}
+      </span>
+    </div>
+    <span className="text-sky-700 font-medium">
+      {`Welcome, ${user.username}!`}
+    </span>
+    {user.isPremium ? (
+      <span className="text-purple-600 font-bold text-sm">
+        PREMIUM ✨
+      </span>
+    ) : (
+      <span className="text-amber-600 text-sm">
+        {userRequestsCount} / {LOGGED_IN_FREE_LIMIT}
+      </span>
+    )}
+    <button
+      onClick={mockLogout}
+      className="text-sky-600 hover:text-sky-800 font-medium text-sm transition-colors"
+    >
+      Logout
+    </button>
+  </div>
+) : (
+  <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-xl px-4 py-2 border border-sky-200">
+    <span className="text-sky-600 text-sm">
+      Please log in to use StudyBuddy
+    </span>
+  </div>
+)}
+          
         {/* Floating Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-sky-400 to-blue-500 rounded-3xl mb-6 shadow-2xl shadow-sky-200">
