@@ -65,28 +65,42 @@ const StudyBuddy = () => {
   };
 
   useEffect(() => {
-    // Attempt to load logged-in user first
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      const lastRequestDate = new Date(parsedUser.lastRequestDate);
-      const today = new Date();
+  // Attempt to load logged-in user first
+  const storedUser = localStorage.getItem("user");
+  if (storedUser) {
+    const parsedUser = JSON.parse(storedUser);
+    const lastRequestDate = new Date(parsedUser.lastRequestDate);
+    const today = new Date();
 
-      if (
-        !parsedUser.isPremium &&
-        lastRequestDate.toDateString() !== today.toDateString()
-      ) {
-        parsedUser.dailyRequestsCount = 0;
-        parsedUser.lastRequestDate = today.toISOString();
-        localStorage.setItem("user", JSON.stringify(parsedUser));
-      }
-      setUser(parsedUser);
-      setUserRequestsCount(parsedUser.dailyRequestsCount || 0);
-    }else {
-        setUser(null);
-        setUserRequestsCount(0);
-      }
-    
+    if (
+      !parsedUser.isPremium &&
+      lastRequestDate.toDateString() !== today.toDateString()
+    ) {
+      parsedUser.dailyRequestsCount = 0;
+      parsedUser.lastRequestDate = today.toISOString();
+      localStorage.setItem("user", JSON.stringify(parsedUser));
+    }
+    setUser(parsedUser);
+    setUserRequestsCount(parsedUser.dailyRequestsCount || 0);
+  } else {
+    setUser(null);
+    // Handle anonymous user daily reset
+    const today = new Date().toDateString();
+    const lastDate = localStorage.getItem("anonymousUserLastRequestDate");
+    if (lastDate !== today) {
+      // New day, reset count
+      localStorage.setItem("anonymousUserRequestsCount", "0");
+      localStorage.setItem("anonymousUserLastRequestDate", today);
+      setUserRequestsCount(0);
+    } else {
+      // Same day, restore count
+      const anonCount = parseInt(localStorage.getItem("anonymousUserRequestsCount") || "0", 10);
+      setUserRequestsCount(anonCount);
+    }
+  }
+
+  // ...rest of your useEffect (if any)...
+
 
     // Load last study output from localStorage
     const lastStudyData = localStorage.getItem("lastStudyOutput");
@@ -292,23 +306,14 @@ const checkAndHandleLimit = () => {
     }
 
     // For anonymous (not logged in) users
-    if (!user) {
-      setUserRequestsCount((prev) => prev + 1);
-      localStorage.setItem(
-        "anonymousUserId",
-        "anonymous"
-      );
-      localStorage.setItem(
-        `anonUser_anonymous`,
-        JSON.stringify({
-          _id: "anonymous",
-          isAnonymous: true,
-          isPremium: false,
-          dailyRequestsCount: userRequestsCount + 1,
-          lastRequestDate: new Date().toISOString(),
-        })
-      );
-    }
+   // For anonymous (not logged in) users
+if (!user) {
+  const today = new Date().toDateString();
+  const newCount = userRequestsCount + 1;
+  setUserRequestsCount(newCount);
+  localStorage.setItem("anonymousUserRequestsCount", newCount);
+  localStorage.setItem("anonymousUserLastRequestDate", today);
+}
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -420,22 +425,12 @@ const checkAndHandleLimit = () => {
 
     // Increment anonymous usage count
     if (!user) {
-      setUserRequestsCount((prev) => prev + 1);
-      localStorage.setItem(
-        "anonymousUserId",
-        "anonymous"
-      );
-      localStorage.setItem(
-        `anonUser_anonymous`,
-        JSON.stringify({
-          _id: "anonymous",
-          isAnonymous: true,
-          isPremium: false,
-          dailyRequestsCount: userRequestsCount + 1,
-          lastRequestDate: new Date().toISOString(),
-        })
-      );
-    }
+  const today = new Date().toDateString();
+  const newCount = userRequestsCount + 1;
+  setUserRequestsCount(newCount);
+  localStorage.setItem("anonymousUserRequestsCount", newCount);
+  localStorage.setItem("anonymousUserLastRequestDate", today);
+}
 
     if (!response.ok) {
       const errorData = await response.json();
