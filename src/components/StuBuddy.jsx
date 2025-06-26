@@ -86,7 +86,7 @@ const StudyBuddy = () => {
         setUser(null);
         setUserRequestsCount(0);
       }
-    }
+    
 
     // Load last study output from localStorage
     const lastStudyData = localStorage.getItem("lastStudyOutput");
