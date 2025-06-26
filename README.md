@@ -33,7 +33,7 @@
 * **AI Layer:** **Gemini 2.0 Flash** via `@google/generative-ai` SDK
 * **Deployment:** Vercel (frontend) · Render (backend API) · MongoDB Atlas
 
----
+
 
 
 ```
@@ -85,10 +85,10 @@ npm run dev               # http://localhost:5173
 
 ## 🧩 API Endpoints (Server)
 
-| Method | Endpoint         | Body                 | Description                      |
-| ------ | ---------------- | -------------------- | -------------------------------- |
-| `POST` | `/api/ask`       | `{ prompt: string }` | Returns model answer & breakdown |
-| `POST` | `/api/resources` | `{ topic: string }`  | Returns curated YouTube/URL list |
+| Method | Endpoint           | Body                     | Description                        |
+| ------ | ----------------   | --------------------     | --------------------------------   |
+| `POST` | `/api/study`       | `{ prompt: string }`     | Returns model answer & breakdown   |
+| `POST` | `/api/explain`     | `{ topic: string }`      | Returns explanation                |
 
 > Detailed Swagger docs at `/api-docs` once the server is running.
 
@@ -115,7 +115,7 @@ Distributed under the **MIT** License. See `LICENSE` for details.
 
 ## 🙋‍♂️ Author
 
-**Your Name** – [@LinkedIn](https://www.linkedin.com/in/shruti-rapolu/) 
+**Shruti Rapolu** – [@LinkedIn](https://www.linkedin.com/in/shruti-rapolu/) 
 
 ---
 
