@@ -32,7 +32,7 @@ const StudyBuddy = () => {
   const [showDummyPaymentModal, setShowDummyPaymentModal] = useState(false);
 
   // Define limits
-  const ANONYMOUS_FREE_LIMIT = 1;
+  const ANONYMOUS_FREE_LIMIT = 3;
   const LOGGED_IN_FREE_LIMIT = 2;
 
   // Determine the effective DAILY_FREE_LIMIT based on user status
