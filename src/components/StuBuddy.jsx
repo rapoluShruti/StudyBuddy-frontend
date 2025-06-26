@@ -176,19 +176,19 @@ const StudyBuddy = () => {
   //   return false;
   // };
 //check
-  const checkAndHandleLimit = () => {
-  // Require login for all users
-  if (!user) {
-    setShowLoginModal(true);
-    setError("Please log in to continue!");
-    return true;
-  }
+const checkAndHandleLimit = () => {
   // Premium users have no limit
-  if (user.isPremium) {
+  if (user && user.isPremium) {
     return false;
   }
-  // Free user daily limit
-  if (userRequestsCount >= LOGGED_IN_FREE_LIMIT) {
+  // Anonymous (not logged in) user: allow up to ANONYMOUS_FREE_LIMIT
+  if (!user && userRequestsCount >= ANONYMOUS_FREE_LIMIT) {
+    setShowLoginModal(true);
+    setError("You've used your free searches. Please log in to continue!");
+    return true;
+  }
+  // Logged in, not premium: allow up to LOGGED_IN_FREE_LIMIT
+  if (user && !user.isPremium && userRequestsCount >= LOGGED_IN_FREE_LIMIT) {
     setShowDummyPaymentModal(true);
     setError(
       `You've used your ${LOGGED_IN_FREE_LIMIT} free requests for today. Please upgrade to continue!`
