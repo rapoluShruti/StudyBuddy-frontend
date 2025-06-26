@@ -811,7 +811,8 @@ const StudyBuddy = () => {
   </div>
 )}
             </div>
-          
+          </div>
+       
         {/* Floating Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-sky-400 to-blue-500 rounded-3xl mb-6 shadow-2xl shadow-sky-200">
