@@ -384,59 +384,125 @@ const checkAndHandleLimit = () => {
   }
 };
 
+  // const handleAskBuddy = async () => {
+  //   if (!selectedText) return;
+
+  //   if (!user || user.isAnonymous) {
+  //     setShowLoginModal(true);
+  //     setError("Please log in to use StudyBuddy.");
+  //     return;
+  //   }
+
+  //   if (checkAndHandleLimit()) {
+  //     return;
+  //   }
+
+  //   setExplanationLoading(true);
+  //   setBuddyExplanation("");
+  //   setShowExplanationModal(true);
+  //   setShowPopup(false);
+
+  //   try {
+  //     const response = await fetch(
+  //       `${import.meta.env.VITE_API_BASE_URL}/api/explain`,
+  //       commonFetchOptions("POST", { selectedText, contextNotes: notes })
+  //     );
+
+  //     if (user && !user.isPremium) {
+  //       const updatedUser = {
+  //         ...user,
+  //         dailyRequestsCount: (user.dailyRequestsCount || 0) + 1,
+  //       };
+  //       updateUsageAndUser(updatedUser);
+  //     }
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       if (errorData.code === "LIMIT_EXCEEDED") {
+  //         setError(errorData.error);
+  //         setShowExplanationModal(false);
+  //         setShowDummyPaymentModal(true);
+  //         return;
+  //       }
+  //       throw new Error(errorData.error || `Status: ${response.status}`);
+  //     }
+
+  //     const data = await response.json();
+  //     setBuddyExplanation(data.explanation);
+  //   } catch (err) {
+  //     setBuddyExplanation(`Failed to get explanation: ${err.message}`);
+  //   } finally {
+  //     setExplanationLoading(false);
+  //     setSelectedText("");
+  //     window.getSelection().removeAllRanges();
+  //   }
+  // };
   const handleAskBuddy = async () => {
-    if (!selectedText) return;
+  if (!selectedText) return;
 
-    if (!user || user.isAnonymous) {
-      setShowLoginModal(true);
-      setError("Please log in to use StudyBuddy.");
-      return;
+  if (checkAndHandleLimit()) {
+    return;
+  }
+
+  setExplanationLoading(true);
+  setBuddyExplanation("");
+  setShowExplanationModal(true);
+  setShowPopup(false);
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/explain`,
+      commonFetchOptions("POST", { selectedText, contextNotes: notes })
+    );
+
+    if (user && !user.isPremium) {
+      const updatedUser = {
+        ...user,
+        dailyRequestsCount: (user.dailyRequestsCount || 0) + 1,
+      };
+      updateUsageAndUser(updatedUser);
     }
 
-    if (checkAndHandleLimit()) {
-      return;
-    }
-
-    setExplanationLoading(true);
-    setBuddyExplanation("");
-    setShowExplanationModal(true);
-    setShowPopup(false);
-
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/explain`,
-        commonFetchOptions("POST", { selectedText, contextNotes: notes })
+    // Increment anonymous usage count
+    if (!user) {
+      setUserRequestsCount((prev) => prev + 1);
+      localStorage.setItem(
+        "anonymousUserId",
+        "anonymous"
       );
-
-      if (user && !user.isPremium) {
-        const updatedUser = {
-          ...user,
-          dailyRequestsCount: (user.dailyRequestsCount || 0) + 1,
-        };
-        updateUsageAndUser(updatedUser);
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        if (errorData.code === "LIMIT_EXCEEDED") {
-          setError(errorData.error);
-          setShowExplanationModal(false);
-          setShowDummyPaymentModal(true);
-          return;
-        }
-        throw new Error(errorData.error || `Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setBuddyExplanation(data.explanation);
-    } catch (err) {
-      setBuddyExplanation(`Failed to get explanation: ${err.message}`);
-    } finally {
-      setExplanationLoading(false);
-      setSelectedText("");
-      window.getSelection().removeAllRanges();
+      localStorage.setItem(
+        `anonUser_anonymous`,
+        JSON.stringify({
+          _id: "anonymous",
+          isAnonymous: true,
+          isPremium: false,
+          dailyRequestsCount: userRequestsCount + 1,
+          lastRequestDate: new Date().toISOString(),
+        })
+      );
     }
-  };
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      if (errorData.code === "LIMIT_EXCEEDED") {
+        setError(errorData.error);
+        setShowExplanationModal(false);
+        setShowDummyPaymentModal(true);
+        return;
+      }
+      throw new Error(errorData.error || `Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setBuddyExplanation(data.explanation);
+  } catch (err) {
+    setBuddyExplanation(`Failed to get explanation: ${err.message}`);
+  } finally {
+    setExplanationLoading(false);
+    setSelectedText("");
+    window.getSelection().removeAllRanges();
+  }
+};ś
 
   const mockLogout = () => {
     localStorage.removeItem("user");
